@@ -6,6 +6,6 @@ Replace the sample credentials in `config.json.sample` with your own and rename 
 
 This toggles the Hide Distribution Graphs course setting.
 
-# Update Notification Frequency
+# Update Notification Frequency for Observers
 
 ...
