@@ -2,10 +2,10 @@ You will need this wonderful [Python Wrapper for the Canvas API](https://github.
 
 Replace the sample credentials in `config.json.sample` with your own and rename the file to `config.json`
 
-# Hide Distribution Graphs
+## Hide Distribution Graphs
 
 This toggles the Hide Distribution Graphs course setting.
 
-# Update Notification Frequency for Observers
+## Update Notification Frequency for Observers
 
 ...
