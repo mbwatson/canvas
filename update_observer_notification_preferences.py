@@ -2,11 +2,14 @@
 
 import requests
 
-access_token = '2452~1SelymsKG1Wr30iYMyqiV4qDpXuQp5nJi6o201SxrQJ5sI4RWYWZuWQfkhS1XQRm' # your access token
-url = 'https://sms.beta.instructure.com/api/v1/users/self/communication_channels/382/notification_preferences/new_announcement'
+import json
+with open('config.json', 'r') as f:
+  config = json.load(f)
+API_URL = config['Production']['API_URL']
+API_KEY = config['Production']['API_KEY']
 header = {
     'Content-type': 'application/json',
-    'Authorization' : 'Bearer ' + access_token
+    'Authorization' : 'Bearer ' + API_KEY
 }
 # payload = {
 #   "notification_preferences": [
@@ -112,4 +115,4 @@ payload = {
   "frequency": "never"
 }
 
-r = requests.put(url, headers = header, json = payload)
+r = requests.put(API_URL, headers = header, json = payload)
