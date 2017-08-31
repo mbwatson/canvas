@@ -4,19 +4,11 @@
 from canvasapi import Canvas
 from itertools import chain
 
-# Get Canvas API URL and Key from user...
-print("\nWhat instance of Canvas ( _________.instructure.com ) ? ")
-instance = input(" >> ")
-API_URL = "https://{}.instructure.com/api/v1/".format(instance)
-print("\nAPI KEY?")
-API_KEY = input(" >> ")
-# ...or hardcode this stuff
-# sms
-# API_URL = "https://sms.instructure.com/api/v1/"
-# API_KEY = "2452~oFBYJxGFuMJk4iflxAi2OYVeElXDfnTAS8dbWe8hzISdc0wybIsGb8nWroVuxHAd"
-# sms.beta
-API_URL = "https://sms.beta.instructure.com/api/v1/"
-API_KEY = "2452~1SelymsKG1Wr30iYMyqiV4qDpXuQp5nJi6o201SxrQJ5sI4RWYWZuWQfkhS1XQRm" # sms.beta
+import json
+with open('config.json', 'r') as f:
+  config = json.load(f)
+API_URL = config['Production']['API_URL']
+API_KEY = config['Production']['API_KEY']
 
 # Attempt with entered credentials
 print("\nAttempting to access {}".format(API_URL))
