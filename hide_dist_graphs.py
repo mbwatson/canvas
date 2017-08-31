@@ -10,9 +10,12 @@ instance = input(" >> ")
 API_URL = "https://{}.instructure.com/api/v1/".format(instance)
 print("\nAPI KEY?")
 API_KEY = input(" >> ")
-# ...or hardcode this stuff
-# API_URL = "https://sms.instructure.com/api/v1/"
-# API_KEY = "2452~oFBYJxGFuMJk4iflxAi2OYVeElXDfnTAS8dbWe8hzISdc0wybIsGb8nWroVuxHAd"
+# ...or pull from json config file
+import json
+with open('config.json', 'r') as f:
+  config = json.load(f)
+API_URL = config['Production']['API_URL']
+API_KEY = config['Production']['API_KEY']
 
 # Attempt with entered credentials
 print("\nAttempting to access {}".format(API_URL))
@@ -26,17 +29,15 @@ except:
 	print(" >> An error occurred!\n")
 else:
 	print("\n=== " + account.name + " ===\n")
-
+	# Gather courses for various current terms
 	fallCourses = account.get_courses(per_page=500, enrollment_term_id=101)
 	springCourses = account.get_courses(per_page=500, enrollment_term_id=105)
 	yearlongCourses = account.get_courses(per_page=500, enrollment_term_id=120)
-	# Combine all current term courses
+	# Combine all current courses into one list
 	courses = list(chain(fallCourses, springCourses, yearlongCourses))
-
+	# Iterate through each course, updating settings
 	for course in courses:
 		print(course.name + " ( " + str(course.id) + " )")
 		# course.update_settings(hide_distribution_graphs="true")
-		print("ok.")
-		
-
+		print("OK!")
 
