@@ -4,7 +4,7 @@ Replace the sample credentials in `config.json.sample` with your own and rename 
 
 ## Hide Distribution Graphs
 
-This toggles the Hide Distribution Graphs course setting.
+Toggles on (or off) the Hide Distribution Graphs course setting for all courses in a hard-coded set of terms (given as term_ids)
 
 ## Update Notification Frequency for Observers
 
