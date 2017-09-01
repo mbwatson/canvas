@@ -5,12 +5,14 @@ Replace the sample credentials in `config.json.sample` with your own and rename 
 ## Hide Distribution Graphs
 `hide_distribution_graphs.py`
 
-Toggles on (or off) the Hide Distribution Graphs course setting for all courses in a hard-coded set of terms (given as term_ids)
+This script toggles on (or off) the Hide Distribution Graphs course setting for all courses in a hard-coded set of terms (given as term_ids)
 
 ## Update Notification Frequency for Observers
 `update_observer_notification_preferences.py`
 
-Currently this script changes observer notification preferences on every communication channel for every type of notification to "never" by hard-coding a course id.
+Currently this one changes observer notification preferences on every communication channel to "never" by hard-coding a course id.
+
+The script, takes a course (given by course_id), and builds a list of all observers enrolled in the course. Then for each observer, all communication channels are looped through, and every communication notification frequency is set to "never," but of course this can be changed (hard-coded) to set all to another setting
 
 #### Needs investigation
 
