@@ -18,5 +18,9 @@ The script, takes a course (given by course_id), and builds a list of all observ
 
 Two notification channels aren't changing:
 
-* discussionentry (which shows as "discussion_entry" accessing raw data in browser bu is being read as "discussionentry" by hitting the endpoint `users/:user_id/communication_channels/:communication_channel_id/notification_preference_categories`)
+* discussionentry
+ - hitting the endpoint `users/self/
+communication_channels/:communication_channel_id/notification_preference_categories` sends back raw data with `discussion_entry` in the browser
+ - hitting `users/:user_id/communication_channels/:channel_id/notification_preference_categories` in Pythin send back `discussionentry`
 * registration
+ - Can't seem to change this one
