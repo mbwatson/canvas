@@ -1,118 +1,69 @@
 #!/usr/bin/python
 
+from canvasapi import Canvas
 import requests
-
 import json
+
+# terms
+# 	courses
+# 		observers
+# 			channels *
+# 				categories *
+
+def get_observers_in_course(course):
+	print(course.name)
+	observers = course.get_users(enrollment="observer")
+	print("\nObservers:\n")
+	for observer in observers:
+		print(" - " + observer.name + " (" + str(observer.id) + ")")
+		user = canvas.get_user(observer.id)
+		channels = user.list_communication_channels()
+		for channel in channels:
+			print("   " + str(channel.type) + ": " + str(channel))
+			# print("   " + str(channel.__dict__))
+		print();
+
 with open('config.json', 'r') as f:
   config = json.load(f)
-API_URL = config['Production']['API_URL']
-API_KEY = config['Production']['API_KEY']
-header = {
+API_URL = config['Beta']['API_URL']
+API_KEY = config['Beta']['API_KEY']
+headers = {
     'Content-type': 'application/json',
     'Authorization' : 'Bearer ' + API_KEY
 }
-# payload = {
-#   "notification_preferences": [
-#     { "frequency": "never", "notification": "new_announcement", "category": "announcement" },
-#     { "frequency": "never", "notification": "assignment_due_date_changed", "category": "due_date" },
-#     { "frequency": "never", "notification": "assignment_changed", "category": "course_content" },
-#     { "frequency": "never", "notification": "assignment_created", "category": "due_date" },
-#     { "frequency": "never", "notification": "grade_weight_changed", "category": "grading_policies" },
-#     { "frequency": "never", "notification": "assignment_graded", "category": "grading" },
-#     { "frequency": "never", "notification": "new_event_created", "category": "calendar" },
-#     { "frequency": "never", "notification": "event_date_changed", "category": "calendar" },
-#     { "frequency": "never", "notification": "collaboration_invitation", "category": "invitation" },
-#     { "frequency": "never", "notification": "web_conference_invitation", "category": "invitation" },
-#     { "frequency": "never", "notification": "confirm_email_communication_channel", "category": "registration" },
-#     { "frequency": "never", "notification": "confirm_sms_communication_channel", "category": "registration" },
-#     { "frequency": "never", "notification": "confirm_registration", "category": "registration" },
-#     { "frequency": "never", "notification": "forgot_password", "category": "registration" },
-#     { "frequency": "never", "notification": "new_discussion_topic", "category": "discussion" },
-#     { "frequency": "never", "notification": "enrollment_invitation", "category": "registration" },
-#     { "frequency": "never", "notification": "enrollment_notification", "category": "registration" },
-#     { "frequency": "never", "notification": "assignment_submitted_late", "category": "late_grading" },
-#     { "frequency": "never", "notification": "group_assignment_submitted_late", "category": "late_grading" },
-#     { "frequency": "never", "notification": "submission_graded", "category": "grading" },
-#     { "frequency": "never", "notification": "submission_comment", "category": "submission_comment" },
-#     { "frequency": "never", "notification": "submission_grade_changed", "category": "grading" },
-#     { "frequency": "never", "notification": "new_wiki_page", "category": "course_content" },
-#     { "frequency": "never", "notification": "updated_wiki_page", "category": "course_content" },
-#     { "frequency": "never", "notification": "summaries", "category": "summaries" },
-#     { "frequency": "never", "notification": "enrollment_registration", "category": "registration" },
-#     { "frequency": "never", "notification": "rubric_assessment_submission_reminder", "category": "invitation" },
-#     { "frequency": "never", "notification": "rubric_assessment_invitation", "category": "invitation" },
-#     { "frequency": "never", "notification": "rubric_association_created", "category": "invitation" },
-#     { "frequency": "never", "notification": "new_account_user", "category": "other" },
-#     { "frequency": "never", "notification": "assignment_publishing_reminder", "category": "reminder" },
-#     { "frequency": "never", "notification": "assignment_grading_reminder", "category": "reminder" },
-#     { "frequency": "never", "notification": "assignment_due_date_reminder", "category": "reminder" },
-#     { "frequency": "never", "notification": "teacher_context_message", "category": "other" },
-#     { "frequency": "never", "notification": "new_context_group_membership", "category": "membership_update" },
-#     { "frequency": "never", "notification": "submission_comment_for_teacher", "category": "submission_comment" },
-#     { "frequency": "never", "notification": "enrollment_accepted", "category": "membership_update" },
-#     { "frequency": "never", "notification": "new_context_group_membership_invitation", "category": "invitation" },
-#     { "frequency": "never", "notification": "group_membership_accepted", "category": "membership_update" },
-#     { "frequency": "never", "notification": "group_membership_rejected", "category": "membership_update" },
-#     { "frequency": "never", "notification": "new_student_organized_group", "category": "other" },
-#     { "frequency": "never", "notification": "new_course", "category": "other" },
-#     { "frequency": "never", "notification": "new_user", "category": "other" },
-#     { "frequency": "never", "notification": "new_teacher_registration", "category": "other" },
-#     { "frequency": "never", "notification": "new_discussion_entry", "category": "discussion_entry" },
-#     { "frequency": "never", "notification": "migration_export_ready", "category": "migration" },
-#     { "frequency": "never", "notification": "migration_import_finished", "category": "migration" },
-#     { "frequency": "never", "notification": "merge_email_communication_channel", "category": "registration" },
-#     { "frequency": "never", "notification": "migration_import_failed", "category": "migration" },
-#     { "frequency": "never", "notification": "assignment_submitted", "category": "all_submissions" },
-#     { "frequency": "never", "notification": "assignment_resubmitted", "category": "all_submissions" },
-#     { "frequency": "never", "notification": "new_teacher_registration_immediate", "category": "other" },
-#     { "frequency": "never", "notification": "report_generated", "category": "other" },
-#     { "frequency": "never", "notification": "report_generation_failed", "category": "other" },
-#     { "frequency": "never", "notification": "account_user_registration", "category": "registration" },
-#     { "frequency": "never", "notification": "account_user_notification", "category": "registration" },
-#     { "frequency": "never", "notification": "pseudonym_registration", "category": "registration" },
-#     { "frequency": "never", "notification": "content_export_finished", "category": "migration" },
-#     { "frequency": "never", "notification": "content_export_failed", "category": "migration" },
-#     { "frequency": "never", "notification": "conversation_message", "category": "conversation_message" },
-#     { "frequency": "never", "notification": "added_to_conversation", "category": "added_to_conversation" },
-#     { "frequency": "never", "notification": "alert", "category": "alert" },
-#     { "frequency": "never", "notification": "assignment_unmuted", "category": "grading" },
-#     { "frequency": "never", "notification": "appointment_canceled_by_user", "category": "student_appointment_signups" },
-#     { "frequency": "never", "notification": "appointment_deleted_for_user", "category": "appointment_cancelations" },
-#     { "frequency": "never", "notification": "appointment_group_deleted", "category": "appointment_cancelations" },
-#     { "frequency": "never", "notification": "appointment_group_published", "category": "appointment_availability" },
-#     { "frequency": "never", "notification": "appointment_group_updated", "category": "appointment_availability" },
-#     { "frequency": "never", "notification": "appointment_reserved_by_user", "category": "student_appointment_signups" },
-#     { "frequency": "never", "notification": "appointment_reserved_for_user", "category": "appointment_signups" },
-#     { "frequency": "never", "notification": "new_file_added", "category": "files" },
-#     { "frequency": "never", "notification": "new_files_added", "category": "files" },
-#     { "frequency": "never", "notification": "assignment_due_date_override_changed", "category": "due_date" },
-#     { "frequency": "never", "notification": "canvasnet_migration", "category": "registration" },
-#     { "frequency": "never", "notification": "course_started", "category": "registration" },
-#     { "frequency": "never", "notification": "course_starts_in_week", "category": "registration" },
-#     { "frequency": "never", "notification": "course_required_materials", "category": "registration" },
-#     { "frequency": "never", "notification": "course_already_started", "category": "registration" },
-#     { "frequency": "never", "notification": "submission_needs_grading", "category": "all_submissions" },
-#     { "frequency": "never", "notification": "quiz_regrade_finished", "category": "grading" },
-#     { "frequency": "never", "notification": "self_enrollment_registration", "category": "registration" },
-#     { "frequency": "never", "notification": "twd_migration_new", "category": "registration" },
-#     { "frequency": "never", "notification": "twd_migration_existing", "category": "registration" },
-#     { "frequency": "never", "notification": "twd_migration_new_late", "category": "registration" },
-#     { "frequency": "never", "notification": "twd_migration_existing_late", "category": "registration" },
-#     { "frequency": "never", "notification": "peer_review_invitation", "category": "invitation" },
-#     { "frequency": "never", "notification": "announcement_created_by_you", "category": "announcement_created_by_you" },
-#     { "frequency": "never", "notification": "announcement_reply", "category": "announcement_created_by_you" },
-#     { "frequency": "never", "notification": "conversation_created", "category": "conversation_created" },
-#     { "frequency": "never", "notification": "web_conference_recording_ready", "category": "recording_ready" },
-#     { "frequency": "never", "notification": "pseudonym_registration_done", "category": "registration" },
-#     { "frequency": "never", "notification": "blueprint_content_added", "category": "blueprint" },
-#     { "frequency": "never", "notification": "blueprint_sync_complete", "category": "blueprint" }
-#   ]
-# }
-payload = {
-  "href": "https://sms.beta.instructure.com/users/self/communication_channels/email/mwatson@sms.edu/notification_preferences/new_announcement",
-  "notification": "new_announcement",
-  "category": "announcement",
-  "frequency": "never"
-}
+preference = "never"
 
-r = requests.put(API_URL, headers = header, json = payload)
+try:
+	# Attempt access with entered credentials
+	print("\nAccessing {}".format(API_URL))
+	print("with API key {}...\n".format(API_KEY))
+	canvas = Canvas(API_URL, API_KEY)
+	account = canvas.get_account(1);
+except:
+	print("An error occurred accessing the API!")
+else:
+	course = canvas.get_course(1819)
+	print(course.name)
+	observers = course.get_users(enrollment_type="observer")
+	print("\nObservers:\n")
+	for user in observers:
+		###########################
+		print("="*(len(user.name)))
+		print(user.name)
+		print("ID: " + str(user.id))
+		print("="*(len(user.name)))
+		###########################
+		channels = user.list_communication_channels()
+		for channel in channels:
+			print("\n" + user.name + "  < " + str(channel) + " >\n")
+			response = requests.get(API_URL + "users/{}/communication_channels/{}/notification_preference_categories".format(user.id, channel.id), headers = headers)
+			categories = response.json()['categories']
+			payload = { "notification_preferences": [ {"frequency": preference} ] }
+			for category in categories:
+				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preference_categories/{}?as_user_id={}".format(channel.id, category, user.id), headers = headers, json = payload)
+				print("* Category " + category, end = "")
+				if response.status_code == 200:
+					print(" - OK, set to " + preference + "!")
+				else:
+					print("  * * * Error " + str(response.status_code) + " * * *")
+	print()
