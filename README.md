@@ -16,5 +16,5 @@ Currently this script changes observer notification preferences on every communi
 
 Two notification channels aren't changing:
 
-* discussionentry (which shows as "discussion_entry" accessing raw data in browser)
+* discussionentry (which shows as "discussion_entry" accessing raw data in browser bu is being read as "discussionentry" by `https://instance.instructure.com/api/v1/"users/:user_id/communication_channels/:communication_channel_id/notification_preference_categories`)
 * registration
