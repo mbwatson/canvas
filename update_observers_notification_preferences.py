@@ -17,7 +17,7 @@ headers = {
     'Authorization' : 'Bearer ' + API_KEY
 }
 
-obesrvers = []
+term_ids = [101, 105, 120] # IDs of terms from which to gather obervers
 
 def get_courses_by_term_ids(idList):
 	# Grab courses
@@ -46,14 +46,11 @@ def update_user_notification_preferences(user, desired_preference):
 		response = requests.get(API_URL + "users/{}/communication_channels/{}/notification_preferences".format(user.id, channel.id), headers = headers)
 		preferences = response.json()['notification_preferences']
 		for preference in preferences:
-			print(" - " + str(preference['notification']) + ": '" + str(preference['frequency']) + "'", end="")
 			if str(preference['frequency']) != desired_preference:
+				print(" - " + str(preference['notification']) + ": '" + str(preference['frequency']) + "'", end="")
 				payload = { "notification_preferences": [ {"frequency": desired_preference} ] }
 				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preferences/{}?as_user_id={}".format(channel.id, preference['notification'], user.id), headers = headers, json = payload)
 				print(" => Changed to '" + desired_preference + "'")
-			else:
-				print(" OK!")
-
 try:
 	# Attempt access with entered credentials
 	print("\nAccessing {}".format(API_URL))
@@ -63,25 +60,27 @@ try:
 except:
 	print("An error occurred accessing the API!")
 else:
-	courses = get_courses_by_term_ids([101, 105, 120])
+	all_observer_ids = []
+	courses = get_courses_by_term_ids(term_ids)
+	print("Courses")
+	print("=======")
+	# Loop through all the courses
 	for course in courses:
+		course_observer_ids = []
 		course_start_time = time.time()
-		print(course.name)
-		print("="*(len(course.name)))
-		observers = course.get_users(enrollment_type="observer")
-		print("\nObservers in " + course.name + ":\n")
-		for user in observers:
-			print(user.name)
-		print()
-		for user in observers:
-			user_start_time = time.time()
-			###########################
-			print()
-			print(user.name + "(ID: " + str(user.id) + ")")
-			print("="*40)
-			###########################
-			update_user_notification_preferences(user, "never")
-			print("\nUser change time: {} seconds".format(time.time() - user_start_time))
-		print()
-		print("\Course change time: {} seconds".format(time.time() - course_start_time))
-	print("\Total program runtime: {} seconds".format(time.time() - program_start_time))
+		course_observers = course.get_users(enrollment_type="observer")
+		for observer in course_observers:
+			course_observer_ids += [observer.id]
+		print(course.name + " + " + str(len(course_observer_ids)) + " observers")
+		all_observer_ids = all_observer_ids + course_observer_ids
+	# Remove duplicates
+	all_observer_ids = set(all_observer_ids)
+	print("\n" + "="*40 + "\n Total: {} observers".format(len(all_observer_ids)) + "\n" + "="*40 + "\n")
+	# Loop through all observers by ID
+	for id in all_observer_ids:
+		user_start_time = time.time()
+		user = canvas.get_user(id)
+		print("\n" + user.name + " (ID: " + str(user.id) + ")\n" + "-"*40)
+		update_user_notification_preferences(user, "never")
+		print("\nUser change time: {} seconds".format(time.time() - user_start_time))
+	print("\nTotal program runtime: {} seconds".format(time.time() - program_start_time))
