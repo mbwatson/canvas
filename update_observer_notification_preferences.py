@@ -11,6 +11,15 @@ import json
 # 			channels *
 # 				categories *
 
+with open('config.json', 'r') as f:
+  config = json.load(f)
+API_URL = config['Beta']['API_URL']
+API_KEY = config['Beta']['API_KEY']
+headers = {
+    'Content-type': 'application/json',
+    'Authorization' : 'Bearer ' + API_KEY
+}
+
 def get_observers_in_course(course):
 	print(course.name)
 	observers = course.get_users(enrollment="observer")
@@ -23,16 +32,6 @@ def get_observers_in_course(course):
 			print("   " + str(channel.type) + ": " + str(channel))
 			# print("   " + str(channel.__dict__))
 		print();
-
-with open('config.json', 'r') as f:
-  config = json.load(f)
-API_URL = config['Beta']['API_URL']
-API_KEY = config['Beta']['API_KEY']
-headers = {
-    'Content-type': 'application/json',
-    'Authorization' : 'Bearer ' + API_KEY
-}
-preference = "never"
 
 def get_courses_by_term_ids(idList):
 	# Grab courses
