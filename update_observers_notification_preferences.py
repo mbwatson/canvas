@@ -20,6 +20,13 @@ headers = {
     'Authorization' : 'Bearer ' + API_KEY
 }
 
+def get_courses_by_term_ids(idList):
+	# Grab courses
+	courses = []
+	for termId in idList:
+		courses = list(chain(courses, account.get_courses(per_page=500, enrollment_term_id=termId)))
+	return(courses)
+
 def get_observers_in_course(course):
 	print(course.name)
 	observers = course.get_users(enrollment="observer")
@@ -31,23 +38,16 @@ def get_observers_in_course(course):
 		for channel in channels:
 			print("   " + str(channel.type) + ": " + str(channel))
 			# print("   " + str(channel.__dict__))
-		print();
-
-def get_courses_by_term_ids(idList):
-	# Grab courses
-	courses = []
-	for termId in idList:
-		courses = list(chain(courses, account.get_courses(per_page=500, enrollment_term_id=termId)))
-	return(courses)
+		print()
 
 def update_user_notification_preferences(user, desired_preference):
 	channels = user.list_communication_channels()
 	for channel in channels:
-		print("\n" + user.name + " -- " + str(channel))
+		print("\n" + str(channel) + "\n")
 		response = requests.get(API_URL + "users/{}/communication_channels/{}/notification_preferences".format(user.id, channel.id), headers = headers)
 		preferences = response.json()['notification_preferences']
 		for preference in preferences:
-			print(str(preference['notification']) + ": '" + str(preference['frequency']) + "'", end="")
+			print(" - " + str(preference['notification']) + ": '" + str(preference['frequency']) + "'", end="")
 			if str(preference['frequency']) != desired_preference:
 				payload = { "notification_preferences": [ {"frequency": desired_preference} ] }
 				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preferences/{}?as_user_id={}".format(channel.id, preference['notification'], user.id), headers = headers, json = payload)
@@ -77,10 +77,8 @@ else:
 		for user in observers:
 			###########################
 			print()
-			print("="*(len(user.name)))
-			print(user.name)
-			print("ID: " + str(user.id))
-			print("="*(len(user.name)))
+			print(user.name + "(ID: " + str(user.id) + ")")
+			print("="*40)
 			###########################
 			update_user_notification_preferences(user, "never")
 		print()
