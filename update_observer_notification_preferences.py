@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from canvasapi import Canvas
+from itertools import chain
 import requests
 import json
 
@@ -33,6 +34,28 @@ headers = {
 }
 preference = "never"
 
+def get_courses_by_term_ids(idList):
+	# Grab courses
+	courses = []
+	for termId in idList:
+		courses = list(chain(courses, account.get_courses(per_page=500, enrollment_term_id=termId)))
+	return(courses)
+
+def update_user_notification_preferences(user, desired_preference):
+	channels = user.list_communication_channels()
+	for channel in channels:
+		print("\n" + user.name + " -- " + str(channel))
+		response = requests.get(API_URL + "users/{}/communication_channels/{}/notification_preferences".format(user.id, channel.id), headers = headers)
+		preferences = response.json()['notification_preferences']
+		for preference in preferences:
+			print(str(preference['notification']) + ": '" + str(preference['frequency']) + "'", end="")
+			if str(preference['frequency']) != desired_preference:
+				payload = { "notification_preferences": [ {"frequency": desired_preference} ] }
+				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preferences/{}?as_user_id={}".format(channel.id, preference['notification'], user.id), headers = headers, json = payload)
+				print(" => Changed to '" + desired_preference + "'")
+			else:
+				print(" OK!")
+
 try:
 	# Attempt access with entered credentials
 	print("\nAccessing {}".format(API_URL))
@@ -42,28 +65,23 @@ try:
 except:
 	print("An error occurred accessing the API!")
 else:
+	courses = get_courses_by_term_ids([101, 105, 120])
 	course = canvas.get_course(1819)
-	print(course.name)
-	observers = course.get_users(enrollment_type="observer")
-	print("\nObservers:\n")
-	for user in observers:
-		###########################
-		print("="*(len(user.name)))
-		print(user.name)
-		print("ID: " + str(user.id))
-		print("="*(len(user.name)))
-		###########################
-		channels = user.list_communication_channels()
-		for channel in channels:
-			print("\n" + user.name + "  < " + str(channel) + " >\n")
-			response = requests.get(API_URL + "users/{}/communication_channels/{}/notification_preference_categories".format(user.id, channel.id), headers = headers)
-			categories = response.json()['categories']
-			payload = { "notification_preferences": [ {"frequency": preference} ] }
-			for category in categories:
-				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preference_categories/{}?as_user_id={}".format(channel.id, category, user.id), headers = headers, json = payload)
-				print("* Category " + category, end = "")
-				if response.status_code == 200:
-					print(" - OK, set to " + preference + "!")
-				else:
-					print("  * * * Error " + str(response.status_code) + " * * *")
-	print()
+	for course in courses:
+		print(course.name)
+		print("="*(len(course.name)))
+		observers = course.get_users(enrollment_type="observer")
+		print("\nObservers in " + course.name + ":\n")
+		for user in observers:
+			print(user.name)
+		print()
+		for user in observers:
+			###########################
+			print()
+			print("="*(len(user.name)))
+			print(user.name)
+			print("ID: " + str(user.id))
+			print("="*(len(user.name)))
+			###########################
+			update_user_notification_preferences(user, "never")
+		print()
