@@ -4,12 +4,9 @@ from canvasapi import Canvas
 from itertools import chain
 import requests
 import json
+import time
 
-# terms
-# 	courses
-# 		observers
-# 			channels *
-# 				categories *
+program_start_time = time.time()
 
 with open('config.json', 'r') as f:
   config = json.load(f)
@@ -19,6 +16,8 @@ headers = {
     'Content-type': 'application/json',
     'Authorization' : 'Bearer ' + API_KEY
 }
+
+obesrvers = []
 
 def get_courses_by_term_ids(idList):
 	# Grab courses
@@ -65,8 +64,8 @@ except:
 	print("An error occurred accessing the API!")
 else:
 	courses = get_courses_by_term_ids([101, 105, 120])
-	course = canvas.get_course(1819)
 	for course in courses:
+		course_start_time = time.time()
 		print(course.name)
 		print("="*(len(course.name)))
 		observers = course.get_users(enrollment_type="observer")
@@ -75,10 +74,14 @@ else:
 			print(user.name)
 		print()
 		for user in observers:
+			user_start_time = time.time()
 			###########################
 			print()
 			print(user.name + "(ID: " + str(user.id) + ")")
 			print("="*40)
 			###########################
 			update_user_notification_preferences(user, "never")
+			print("\nUser change time: {} seconds".format(time.time() - user_start_time))
 		print()
+		print("\Course change time: {} seconds".format(time.time() - course_start_time))
+	print("\Total program runtime: {} seconds".format(time.time() - program_start_time))
