@@ -42,12 +42,12 @@ def get_observers_in_course(course):
 def update_user_notification_preferences(user, desired_preference):
 	channels = user.list_communication_channels()
 	for channel in channels:
-		print("\n" + str(channel) + "\n")
+		print("\n - " + str(channel) + "\n")
 		response = requests.get(API_URL + "users/{}/communication_channels/{}/notification_preferences".format(user.id, channel.id), headers = headers)
 		preferences = response.json()['notification_preferences']
 		for preference in preferences:
 			if str(preference['frequency']) != desired_preference:
-				print(" - " + str(preference['notification']) + ": '" + str(preference['frequency']) + "'", end="")
+				print("    - " + str(preference['notification']) + ": '" + str(preference['frequency']) + "'", end="")
 				payload = { "notification_preferences": [ {"frequency": desired_preference} ] }
 				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preferences/{}?as_user_id={}".format(channel.id, preference['notification'], user.id), headers = headers, json = payload)
 				print(" => Changed to '" + desired_preference + "'")
@@ -62,8 +62,7 @@ except:
 else:
 	all_observer_ids = []
 	courses = get_courses_by_term_ids(term_ids)
-	print("Courses")
-	print("=======")
+	print("Courses\n" + "="*60)
 	# Loop through all the courses
 	for course in courses:
 		course_observer_ids = []
@@ -73,14 +72,22 @@ else:
 			course_observer_ids += [observer.id]
 		print(course.name + " + " + str(len(course_observer_ids)) + " observers")
 		all_observer_ids = all_observer_ids + course_observer_ids
-	# Remove duplicates
+	# Remove duplicates/convert to set
 	all_observer_ids = set(all_observer_ids)
-	print("\n" + "="*40 + "\n Total: {} observers".format(len(all_observer_ids)) + "\n" + "="*40 + "\n")
+	observers_num = len(all_observer_ids)
+	print("\n" + "="*60 + "\n Total: {} observers".format(observers_num) + "\n" + "="*60 + "\n")
 	# Loop through all observers by ID
+	count = 0
 	for id in all_observer_ids:
 		user_start_time = time.time()
 		user = canvas.get_user(id)
-		print("\n" + user.name + " (ID: " + str(user.id) + ")\n" + "-"*40)
+		count += 1
+		print()
+		print(str(count) + "/" + str(observers_num), end="")
+		print(" - " + user.name + " (ID: " + str(user.id) + ")\n" + "-"*60)
 		update_user_notification_preferences(user, "never")
-		print("\nUser change time: {} seconds".format(time.time() - user_start_time))
-	print("\nTotal program runtime: {} seconds".format(time.time() - program_start_time))
+		print()
+		print("User change time: {} seconds".format(time.time() - user_start_time))
+		print("Total program runtime: {} seconds".format(time.time() - program_start_time))
+		print()
+		print("="*60)
