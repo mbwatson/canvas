@@ -21,9 +21,9 @@ headers = {
 # Ids of terms from which to gather courses and their observers
 term_ids = [101, 105, 120] # IDs of terms from which to gather obervers
 
-def get_courses_by_term_ids(idList):
+def get_courses_by_term_ids(term_ids):
 	courses = []
-	for termId in idList:
+	for termId in term_ids:
 		courses = list(chain(courses, account.get_courses(per_page=500, enrollment_term_id=termId)))
 	return(courses)
 
@@ -46,6 +46,7 @@ def update_user_notification_preferences(user, desired_preference):
 				payload = { "notification_preferences": [ {"frequency": desired_preference} ] }
 				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preferences/{}?as_user_id={}".format(channel.id, preference['notification'], user.id), headers = headers, json = payload)
 				print(" => Changed to '" + desired_preference + "'")
+
 try:
 	# Attempt access with entered credentials
 	print("\nAccessing {}".format(API_URL))
@@ -80,6 +81,6 @@ else:
 		update_user_notification_preferences(user, "never")
 		print()
 		print("User change time: {} seconds".format(time.time() - user_start_time))
-		print("Total program runtime: {} seconds".format(time.time() - program_start_time))
+		print("Total runtime: {} seconds".format(time.time() - program_start_time))
 		print()
 		print("="*60)
