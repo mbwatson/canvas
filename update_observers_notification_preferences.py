@@ -8,6 +8,7 @@ import time
 
 program_start_time = time.time()
 
+# Read login credentials
 with open('config.json', 'r') as f:
   config = json.load(f)
 API_URL = config['Beta']['API_URL']
@@ -17,27 +18,21 @@ headers = {
     'Authorization' : 'Bearer ' + API_KEY
 }
 
+# Ids of terms from which to gather courses and their observers
 term_ids = [101, 105, 120] # IDs of terms from which to gather obervers
 
 def get_courses_by_term_ids(idList):
-	# Grab courses
 	courses = []
 	for termId in idList:
 		courses = list(chain(courses, account.get_courses(per_page=500, enrollment_term_id=termId)))
 	return(courses)
 
-def get_observers_in_course(course):
-	print(course.name)
-	observers = course.get_users(enrollment="observer")
-	print("\nObservers:\n")
-	for observer in observers:
-		print(" - " + observer.name + " (" + str(observer.id) + ")")
-		user = canvas.get_user(observer.id)
-		channels = user.list_communication_channels()
-		for channel in channels:
-			print("   " + str(channel.type) + ": " + str(channel))
-			# print("   " + str(channel.__dict__))
-		print()
+def get_course_observer_ids(course):
+	course_observer_ids = []
+	course_observers = course.get_users(enrollment_type="observer")
+	for observer in course_observers:
+		course_observer_ids += [observer.id]
+	return(course_observer_ids)
 
 def update_user_notification_preferences(user, desired_preference):
 	channels = user.list_communication_channels()
@@ -65,11 +60,8 @@ else:
 	print("Courses\n" + "="*60)
 	# Loop through all the courses
 	for course in courses:
-		course_observer_ids = []
 		course_start_time = time.time()
-		course_observers = course.get_users(enrollment_type="observer")
-		for observer in course_observers:
-			course_observer_ids += [observer.id]
+		course_observer_ids = get_course_observer_ids(course)
 		print(course.name + " + " + str(len(course_observer_ids)) + " observers")
 		all_observer_ids = all_observer_ids + course_observer_ids
 	# Remove duplicates/convert to set
@@ -77,13 +69,13 @@ else:
 	observers_num = len(all_observer_ids)
 	print("\n" + "="*60 + "\n Total: {} observers".format(observers_num) + "\n" + "="*60 + "\n")
 	# Loop through all observers by ID
-	count = 0
+	observer_count = 0
 	for id in all_observer_ids:
 		user_start_time = time.time()
 		user = canvas.get_user(id)
-		count += 1
+		observer_count += 1
 		print()
-		print(str(count) + "/" + str(observers_num), end="")
+		print(str(observer_count) + "/" + str(observers_num), end="")
 		print(" - " + user.name + " (ID: " + str(user.id) + ")\n" + "-"*60)
 		update_user_notification_preferences(user, "never")
 		print()
