@@ -12,4 +12,4 @@ This script toggles on (or off) the Hide Distribution Graphs course setting for 
 
 Currently this one changes observer notification preferences on every communication channel to "never" by hard-coding a course id.
 
-The script, takes a course (given by course_id), and builds a list of all observers enrolled in the course. Then for each observer, all communication channels are looped through, and every communication notification frequency is set to "never," but of course this can be changed (hard-coded) to set all to another setting
+The script, takes a list of enrollment_term_ids as command line arguments, builds a list of all observers enrolled in all courses for the given terms. Then for each observer, all communication channels are looped through, and every communication notification frequency is set to "never," but of course this can be changed (hard-coded) to set all to another setting.
