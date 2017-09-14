@@ -19,10 +19,6 @@ API_KEY = config['Beta']['API_KEY']
 # API_KEY = input(" >> ")
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# Attempt with entered credentials
-print("\nAttempting to access {}".format(API_URL))
-print("with API key {}...\n".format(API_KEY))
-
 try:
 	# Attempt access with entered credentials
 	print("\nAccessing {}".format(API_URL))
