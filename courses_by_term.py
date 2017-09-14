@@ -48,11 +48,3 @@ else:
 		if not term['id'] in current_term_ids:
 			concluded_term_ids.append(term['id'])
 	print(concluded_term_ids)
-	# for term_id in term_ids:
-	# 	print(term_id.__dict__)
-
-	# courses = get_courses_by_term_ids(term_ids)
-	# print("Courses\n" + "="*60)
-	# # Loop through all the courses
-	# for course in courses:
-	# 	print(course.name)
