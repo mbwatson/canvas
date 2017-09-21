@@ -79,6 +79,7 @@ else:
 	all_observer_ids = set(all_observer_ids)
 	observers_num = len(all_observer_ids)
 	print("\n" + "="*60 + "\n Total: {} observers".format(observers_num) + "\n" + "="*60 + "\n")
+	print("\n" + "="*60 + "\n Total: {} observers".format(observers_num) + "\n" + "="*60 + "\n")
 	# Loop through all observers by ID
 	observer_count = 0
 	for id in all_observer_ids:
@@ -87,8 +88,8 @@ else:
 		observer_count += 1
 		print()
 		print(str(observer_count) + "/" + str(observers_num), end="")
-		print(" - " + user.name + " (ID: " + str(user.id) + ")\n" + "-"*60)
-		update_user_notification_preferences(user, "never")
+		print(" - {} (ID: {})\n".format(user.name, user.id) + "-"*60)
+		# update_user_notification_preferences(user, "never")
 		print()
 		print("User change time: {} seconds".format(time_since(user_start_time)))
 		print("Total runtime: {} seconds".format(time_since(program_start_time)))
