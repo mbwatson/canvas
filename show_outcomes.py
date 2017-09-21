@@ -18,15 +18,24 @@ class Outcome():
 		self.title = outcome_title
 
 	def __str__(self):
-		return "{}".format(self.title)
+		return "{} ({})".format(self.title, self.id)
+
+def average(scores):
+	total = 0
+	for score in scores:
+		total += score
+	return total / len(scores)
+
+def decaying_average(scores):
+	return 0.65 * scores[0] + 0.35 * average(scores[1:len(scores)])
 
 program_start_time = time.time()
 
 # Read login credentials
 with open('config.json', 'r') as f:
   config = json.load(f)
-API_URL = config['Production']['API_URL']
-API_KEY = config['Production']['API_KEY']
+API_URL = config['Beta']['API_URL']
+API_KEY = config['Beta']['API_KEY']
 headers = {
     'Content-type': 'application/json',
     'Authorization' : 'Bearer ' + API_KEY
@@ -52,17 +61,14 @@ else:
 	print(course.name)
 	students = course.get_users(enrollment_type="student")
 	gradebook = [[0 for col in range(len(list(outcomes)))] for row in range(len(list(students)))]
-	student_index = 0
-	outcome_index = 0
 	for student in students:
-		outcome_index = 0
-		print("{} ({})".format(student.name, student.id))
+		print("{} ({})\n".format(student.name, student.id))
+		response = requests.get(API_URL + "courses/{}/outcome_results?user_ids[]={}".format(course.id, student.id), headers = headers)
+		outcome_results = response.json()['outcome_results']
 		for outcome in outcomes:
-			response = requests.get(API_URL + "courses/{}/outcome_results?user_ids[]={}".format(course.id, student.id), headers = headers)
-			score = response.json()['outcome_results'][0]['score']
-			print("  {}: {}".format(outcome, score))
-			gradebook[student_index][outcome_index] = score
-			outcome_index += 1
+			print(" {}: ".format(outcome.title), end="")
+			for outcome_result in outcome_results:
+				if outcome_result['links']['learning_outcome'] == str(outcome.id):
+					print(outcome_result['score'], end="")
+			print()
 		print()
-		student_index += 1
-	print(gradebook)
