@@ -21,16 +21,36 @@ class Outcome():
 	def __str__(self):
 		return "{} ({})".format(self.title, self.id)
 
+def average(values):
+	if not values:
+		return -1
+	sum = 0
+	for val in values:
+		sum += val
+	return sum / len(values)
+
+def decaying_average(values, index=-1):
+	if len(values) == 1:
+		return values[0]
+	else:
+		non_indexed_values = values[:index] + values[index+1:]	
+		return 0.35*average(non_indexed_values) + 0.65*values[index]
+	# if len(values) == 1:
+	# 	return values[0]
+	# else:
+	# 	indexed_value = values.pop(index)
+	# 	return 0.35*average(values) + 0.65*indexed_value
+
 program_start_time = time.time()
 
 # Read login credentials
 with open('config.json', 'r') as f:
   config = json.load(f)
-API_URL = config['Beta']['API_URL']
-API_KEY = config['Beta']['API_KEY']
+API_URL = config['Production']['API_URL']
+API_KEY = config['Production']['API_KEY']
 headers = {
-    'Content-type': 'application/json',
-    'Authorization' : 'Bearer ' + API_KEY
+  'Content-type': 'application/json',
+  'Authorization' : 'Bearer ' + API_KEY
 }
 
 student_id = sys.argv[1]
@@ -59,9 +79,16 @@ else:
 	response = requests.get(API_URL + "courses/{}/outcome_results?user_ids[]={}".format(course.id, student.id), headers = headers)
 	outcome_results = response.json()['outcome_results']
 	for outcome in outcomes:
-		print(" "*(20-len(outcome.title)) + "{} ({}): ".format(outcome.title, outcome.id), end="")
+		print("{} ({}): ".format(outcome.title, outcome.id), end="")
+		scores = []
 		for outcome_result in outcome_results:
 			if outcome_result['links']['learning_outcome'] == str(outcome.id):
-				print("/"*math.floor(outcome_result['score']*30), end="")
-		print()
+				scores.append(outcome_result['score'])
+		if len(scores) > 0:
+			outcome.score = decaying_average(scores)
+			print(": {} --> {} / 3".format(scores, outcome.score))
+			percentage = math.floor(outcome.score*100/3)
+			print("|"*percentage + " "*(100 - percentage) + "|")
+		else:
+			print("\n" + " "*100 + "|")
 	print()
