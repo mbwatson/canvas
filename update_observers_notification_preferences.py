@@ -48,10 +48,10 @@ def update_user_notification_preferences(user, desired_preference):
 		preferences = response.json()['notification_preferences']
 		for preference in preferences:
 			if str(preference['frequency']) != desired_preference:
-				print("    - " + str(preference['notification']) + ": '" + str(preference['frequency']) + "'", end="")
+				print("    - {}: '{}'".format(preference['notification'],preference['frequency']), end="")
 				payload = { "notification_preferences": [ {"frequency": desired_preference} ] }
 				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preferences/{}?as_user_id={}".format(channel.id, preference['notification'], user.id), headers = headers, json = payload)
-				print(" => Changed to '" + desired_preference + "'")
+				print(" => Changed to '{}'".format(desired_preference))
 
 try:
 	# Attempt access with entered credentials
@@ -73,7 +73,7 @@ else:
 	for course in courses:
 		course_start_time = time.time()
 		course_observer_ids = get_course_observer_ids(course)
-		print(course.name + "  +" + str(len(course_observer_ids)) + " observers")
+		print("{} +{} observers".format(course.name,len(course_observer_ids)))
 		all_observer_ids = all_observer_ids + course_observer_ids
 	# Remove duplicates/convert to set
 	all_observer_ids = set(all_observer_ids)
@@ -86,8 +86,8 @@ else:
 		user = canvas.get_user(id)
 		observer_count += 1
 		print()
-		print(str(observer_count) + "/" + str(observers_num), end="")
-		print(" - " + user.name + " (ID: " + str(user.id) + ")\n" + "-"*60)
+		print("{} / {}".format(observer_count,observers_num), end="")
+		print(" - {} (ID: {})\n".format(user.name,user.id) + "-"*60)
 		update_user_notification_preferences(user, "never")
 		print()
 		print("User change time: {} seconds".format(time_since(user_start_time)))
