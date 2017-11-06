@@ -23,7 +23,7 @@ def update_user_notification_preferences(user, desired_preference):
 		response = requests.get(API_URL + "users/{}/communication_channels/{}/notification_preferences".format(user.id, channel.id), headers = headers)
 		preferences = response.json()['notification_preferences']
 		for preference in preferences:
-			print(str(preference['notification']) + " - " + str(preference['frequency']))
+			print("{} - {}".format(preference['notification'],preference['frequency']))
 			if str(preference['frequency']) != desired_preference:
 				payload = { "notification_preferences": [ {"frequency": desired_preference} ] }
 				response = requests.put(API_URL + "users/self/communication_channels/{}/notification_preferences/{}?as_user_id={}".format(channel.id, preference['notification'], user.id), headers = headers, json = payload)
