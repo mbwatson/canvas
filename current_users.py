@@ -35,6 +35,6 @@ else:
 	for user in users:
 		if len(list(user.get_page_views(start_time="2017-08-01", end_time="2017-09-01"))):
 			if ("@sms.edu" in user.login_id):
-				print(user.name + " < " + user.login_id + " >")
+				print("{} < {} > ".format(user.name, user.login_id))
 				count += 1
 	print(count)
