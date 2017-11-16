@@ -75,7 +75,6 @@ else:
 	print(course.name)
 	student = course.get_user(user_id=student_id)
 	print("Learning Mastery for {}".format(student))
-	print("{} ({})\n".format(student.name, student.id))
 	response = requests.get(API_URL + "courses/{}/outcome_results?user_ids[]={}".format(course.id, student.id), headers = headers)
 	outcome_results = response.json()['outcome_results']
 	for outcome in outcomes:
@@ -86,7 +85,7 @@ else:
 				scores.append(outcome_result['score'])
 		if len(scores) > 0:
 			outcome.score = decaying_average(scores)
-			print(": {} --> {} / 3".format(scores, outcome.score))
+			print(": {} --> {} / 3".format(scores, round(outcome.score, 2)))
 			percentage = math.floor(outcome.score*100/3)
 			print("|"*percentage + " "*(100 - percentage) + "|")
 		else:
