@@ -20,15 +20,6 @@ class Outcome():
 	def __str__(self):
 		return "{} ({})".format(self.title, self.id)
 
-def average(scores):
-	total = 0
-	for score in scores:
-		total += score
-	return total / len(scores)
-
-def decaying_average(scores):
-	return 0.65 * scores[0] + 0.35 * average(scores[1:len(scores)])
-
 program_start_time = time.time()
 
 # Read login credentials
