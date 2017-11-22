@@ -43,7 +43,7 @@ def get_course_observer_ids(course):
 def update_user_notification_preferences(user, desired_preference):
 	channels = user.list_communication_channels()
 	for channel in channels:
-		print("\n - " + str(channel) + "\n")
+		print("\n - {}\n".format(str(channel)))
 		response = requests.get(API_URL + "users/{}/communication_channels/{}/notification_preferences".format(user.id, channel.id), headers = headers)
 		preferences = response.json()['notification_preferences']
 		for preference in preferences:
