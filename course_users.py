@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from canvasapi import Canvas
 from itertools import chain
+import requests
+import json
 import sys
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -10,6 +12,10 @@ with open('config.json', 'r') as f:
   config = json.load(f)
 API_URL = config['Production']['API_URL']
 API_KEY = config['Production']['API_KEY']
+headers = {
+  'Content-type': 'application/json',
+  'Authorization' : 'Bearer ' + API_KEY
+}
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 course_id = sys.argv[1]
@@ -29,21 +35,14 @@ else:
 	students = course.get_users(enrollment_type='student')
 	observers = course.get_users(enrollment_type='observer')
 
-	print()
-	
-	print('Students:')
+	print('\nStudents:')
 	for user in students:
 		profile = user.get_profile()
-		name = profile['name']
-		email = profile['login_id']
-		print('{}\t{}'.format(name, email))
-	
-	print()
+		print('{}\t{}\t{}'.format(user.name, user.id, user.sis_login_id))
 
-	print('Observers:')
+	print('\nObservers:')
 	for user in observers:
 		profile = user.get_profile()
-		name = profile['name']
-		email = profile['login_id']
-		print('{}\t{}'.format(name, email))
-		user.list_observees()
+		print('{}\t{}\t{}'.format(user.name, user.id, user.sis_login_id))
+		observees = user.list_observees()
+		# figure out inner loop later
